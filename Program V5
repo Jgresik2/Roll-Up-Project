@@ -1,0 +1,1134 @@
+<title>Roll-Up Sign Configurator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --ink: #171b1d;
+  --muted: #5b6169;
+  --border: #d7dbd8;
+  --panel: #ffffff;
+  --bg: #eef0ee;
+  --accent: #74830f;
+  --accent-ink: #ffffff;
+  --danger: #b3261e;
+  --font-display: "Oswald", "Arial Narrow", sans-serif;
+  --font-body: "Source Sans 3", -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Courier New", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #eef1ef;
+    --muted: #9aa3a8;
+    --border: #2b3134;
+    --panel: #1b2023;
+    --bg: #101314;
+    --accent: #c7dd2e;
+    --accent-ink: #12150a;
+    --danger: #ff8a6e;
+  }
+}
+:root[data-theme="dark"] {
+  --ink: #eef1ef;
+  --muted: #9aa3a8;
+  --border: #2b3134;
+  --panel: #1b2023;
+  --bg: #101314;
+  --accent: #c7dd2e;
+  --accent-ink: #12150a;
+  --danger: #ff8a6e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.app-header {
+  padding: 28px 32px 18px;
+  border-bottom: 3px dashed var(--border);
+}
+.app-header h1 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.subtitle { margin: 0; color: var(--muted); max-width: 65ch; }
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 460px) 1fr;
+  gap: 24px;
+  padding: 24px 32px 32px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 0 0 16px;
+  padding: 14px 16px 16px;
+  background: var(--panel);
+}
+legend {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 6px;
+  color: var(--ink);
+}
+
+label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 10px 0 4px;
+}
+label.mt { margin-top: 14px; }
+
+select, input[type="text"], input[type="email"], input[type="number"], textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--panel);
+  color: var(--ink);
+}
+select:focus-visible, input:focus-visible, textarea:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+textarea { resize: vertical; }
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 4px 0 8px;
+}
+
+.checkbox-row, .radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+.checkbox-row label, .radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  margin: 4px 0;
+}
+
+.hidden { display: none; }
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+button {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+button.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+button.secondary {
+  background: var(--panel);
+  border-color: var(--border);
+  color: var(--ink);
+}
+button:hover { filter: brightness(0.96); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.preview-panel h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-size: 1rem;
+  margin: 4px 0 10px;
+  color: var(--ink);
+}
+
+.preview-frame {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+#preview {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+}
+
+.summary-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--ink);
+}
+
+.line-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.line-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.line-row input[type="text"] { flex: 1; }
+
+button.small {
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  margin-top: 8px;
+}
+button.remove-line {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.velcro-line {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: var(--bg);
+}
+.velcro-line:last-child { margin-bottom: 0; }
+.velcro-line-label {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.velcro-toggle {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.velcro-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  margin: 0;
+}
+.overlay-dims {
+  display: flex;
+  gap: 10px;
+}
+.overlay-dims .dim-field {
+  flex: 1;
+}
+.overlay-dims label {
+  margin: 0 0 4px;
+}
+
+.app-footer {
+  padding: 4px 32px 32px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  max-width: 900px;
+}
+.app-footer a { color: var(--muted); }
+</style>
+
+<header class="app-header">
+  <h1>Roll-Up Sign Configurator</h1>
+  <p class="subtitle">Proof of concept &mdash; configure a diamond roll-up traffic sign, preview it live, and submit a quote request.</p>
+</header>
+
+<main class="layout">
+
+  <section class="form-panel" aria-label="Sign configuration form">
+
+    <fieldset>
+      <legend>Legend</legend>
+
+      <label for="legendPreset">Legend text</label>
+      <select id="legendPreset"></select>
+
+      <div id="customLegendWrap" class="hidden">
+        <label>Custom legend, one line per row</label>
+        <p class="hint">Some states require specific wording on specific lines &mdash; enter each line exactly as it should appear on the sign, top to bottom.</p>
+        <div id="customLegendLines" class="line-list"></div>
+        <button type="button" id="addLegendLineBtn" class="secondary small">+ Add line</button>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Color</legend>
+      <p class="hint">Shape is fixed to diamond, and legend/border color is always black, for this product line.</p>
+
+      <label for="bgColor">Background color</label>
+      <select id="bgColor">
+        <option value="#FF7B00">Orange</option>
+        <option value="#FFFFFF">White</option>
+        <option value="#FF6EC7">Pink</option>
+      </select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Size</legend>
+      <label for="size">Sign size (nominal, inches)</label>
+      <select id="size">
+        <option value="36x36" selected>36" x 36"</option>
+        <option value="48x48">48" x 48"</option>
+      </select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Material</legend>
+
+      <label for="materialMfr">Sheeting manufacturer</label>
+      <select id="materialMfr"></select>
+
+      <label for="materialGrade">Retroreflectivity level</label>
+      <select id="materialGrade"></select>
+
+      <div id="customMaterialWrap" class="hidden">
+        <label for="customMaterial">Custom material / spec notes</label>
+        <input type="text" id="customMaterial" placeholder="e.g. manufacturer + product line">
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Velcro Overlays</legend>
+      <p class="hint">Overlays are always two vertical velcro strips, one on each side of a line of words (or a symbol) that needs to be covered. Turn overlay on per line and, if needed, set the overlay panel's size.</p>
+      <div id="velcroLines"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Frame Pockets</legend>
+      <p class="hint">Pockets are always applied at all four corners of the sign.</p>
+      <label>Pocket type</label>
+      <div class="radio-row">
+        <label><input type="radio" name="pocketType" value="sewn" checked> Sewn pockets</label>
+        <label><input type="radio" name="pocketType" value="plastic"> Plastic pockets</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Contact &amp; Notes</legend>
+      <label for="custName">Name / company</label>
+      <input type="text" id="custName" placeholder="Your name or company">
+
+      <label for="custEmail">Reply-to email</label>
+      <input type="email" id="custEmail" placeholder="you@example.com">
+
+      <label for="notes">Additional notes</label>
+      <textarea id="notes" rows="3" placeholder="Quantity, deadline, special instructions..."></textarea>
+    </fieldset>
+
+    <div class="actions">
+      <button id="resetBtn" type="button" class="secondary">Reset</button>
+      <button id="downloadBtn" type="button" class="secondary">Download Preview (PNG)</button>
+      <button id="submitBtn" type="button" class="primary">Submit Request (Email)</button>
+    </div>
+
+  </section>
+
+  <section class="preview-panel" aria-label="Live sign preview">
+    <h2>Live Preview</h2>
+    <div class="preview-frame">
+      <svg id="preview" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+
+    <h2>Request Summary</h2>
+    <pre id="summary" class="summary-box"></pre>
+  </section>
+
+</main>
+
+<footer class="app-footer">
+  <p>This is a proof-of-concept tool. Legend wording, sizes, and material/retroreflectivity options shown are representative examples. Submitting opens your email client with a pre-filled quote request; you'll still need to attach the downloaded preview image yourself.</p>
+</footer>
+
+<script>
+/* ==========================================================================
+   Roll-Up Reflective Sign Configurator — proof of concept (v2)
+   No build step, no backend. Configure at the top; see README.md.
+   ========================================================================== */
+
+// CHANGE ME: where "Submit Request" mailto links should go.
+const RECIPIENT_EMAIL = "orders@example.com";
+
+// Legend/border color is fixed — this product line always prints black.
+const LEGEND_COLOR = "#000000";
+
+// Standard legend presets, sourced from MUTCD 11th Edition, Figure 6H-1
+// "Warning Signs and Plaques in Temporary Traffic Control Zones" (sheets 1-4).
+// Limited to the diamond-shaped, word-legend signs from that figure — symbol
+// signs (arrows, silhouettes, etc.) and the rectangular/pennant plaques
+// (e.g. W9-2a, W13-4P, W14-3, the G20 series) are out of scope since this
+// product line is diamond-only. `lines` preserves the exact line breaks
+// shown in the figure — verify against the current MUTCD before relying on
+// this for production signage, and extend with more sheets/figures as needed.
+const LEGEND_PRESETS = [
+  { code: "W3-4", lines: ["BE", "PREPARED", "TO STOP"] },
+  { code: "W3-5a", lines: ["45 MPH", "SPEED ZONE", "AHEAD"] },
+  { code: "W5-1", lines: ["ROAD", "NARROWS"] },
+  { code: "W5-2", lines: ["NARROW", "BRIDGE"] },
+  { code: "W5-3", lines: ["ONE LANE", "BRIDGE"] },
+  { code: "W5-4", lines: ["RAMP", "NARROWS"] },
+  { code: "W8-1", lines: ["BUMP"] },
+  { code: "W8-2", lines: ["DIP"] },
+  { code: "W8-3", lines: ["PAVEMENT", "ENDS"] },
+  { code: "W8-4", lines: ["SOFT", "SHOULDER"] },
+  { code: "W8-6", lines: ["TRUCK", "CROSSING"] },
+  { code: "W8-7", lines: ["LOOSE", "GRAVEL"] },
+  { code: "W8-8", lines: ["ROUGH", "ROAD"] },
+  { code: "W8-9", lines: ["LOW", "SHOULDER"] },
+  { code: "W8-11", lines: ["UNEVEN", "LANES"] },
+  { code: "W8-12", lines: ["NO", "CENTER", "LINE"] },
+  { code: "W8-14", lines: ["FALLEN", "ROCKS"] },
+  { code: "W8-15", lines: ["GROOVED", "PAVEMENT"] },
+  { code: "W8-16", lines: ["METAL", "BRIDGE", "DECK"] },
+  { code: "W8-18", lines: ["ROAD", "MAY", "FLOOD"] },
+  { code: "W8-23", lines: ["NO", "SHOULDER"] },
+  { code: "W8-24", lines: ["STEEL", "PLATE", "AHEAD"] },
+  { code: "W8-25", lines: ["SHOULDER", "ENDS"] },
+  { code: "W9-1", lines: ["RIGHT", "LANE ENDS"] },
+  { code: "W9-5a", lines: ["MERGE"] },
+  { code: "W20-1", lines: ["ROAD", "WORK", "1000 FT"] },
+  { code: "W20-1b", lines: ["PATH", "WORK", "AHEAD"] },
+  { code: "W20-2", lines: ["DETOUR", "1000 FT"] },
+  { code: "W20-2a", lines: ["DETOUR", "AHEAD"] },
+  { code: "W20-3", lines: ["ROAD", "CLOSED", "1000 FT"] },
+  { code: "W20-3a", lines: ["PATH", "CLOSED", "AHEAD"] },
+  { code: "W20-4", lines: ["ONE LANE", "ROAD", "1000 FT"] },
+  { code: "W20-5", lines: ["RIGHT LANE", "CLOSED", "1/2 MILE"] },
+  { code: "W20-5a", lines: ["2 RIGHT LANES", "CLOSED", "1/2 MILE"] },
+  { code: "W20-5b", lines: ["BIKE LANE", "CLOSED", "AHEAD"] },
+  { code: "W21-1a", lines: ["WORKERS"] },
+  { code: "W21-2", lines: ["FRESH", "OIL"] },
+  { code: "W21-3", lines: ["ROAD", "MACHINERY", "AHEAD"] },
+  { code: "W21-5", lines: ["SHOULDER", "WORK"] },
+  { code: "W21-5a", lines: ["RIGHT", "SHOULDER", "CLOSED"] },
+  { code: "W21-5b", lines: ["RIGHT SHOULDER", "CLOSED", "1000 FT"] },
+  { code: "W21-6", lines: ["SURVEY", "CREW"] },
+  { code: "W21-7", lines: ["UTILITY", "WORK", "AHEAD"] },
+  { code: "W21-8", lines: ["MOWING", "AHEAD"] },
+  { code: "W22-1", lines: ["BLASTING", "ZONE", "AHEAD"] },
+  { code: "W23-2", lines: ["NEW TRAFFIC", "PATTERN AHEAD"] },
+];
+
+function presetLabel(preset) {
+  return `${preset.lines.join(" ")} (${preset.code})`;
+}
+
+const LEGEND_PRESET_OPTIONS = [
+  ...LEGEND_PRESETS.map((p) => ({ value: p.code, label: presetLabel(p) })),
+  { value: "custom", label: "Custom legend…" },
+];
+
+function findPreset(code) {
+  return LEGEND_PRESETS.find((p) => p.code === code);
+}
+
+// Representative manufacturer -> retroreflectivity product lines.
+// These are illustrative examples, not verified current product names —
+// confirm against current spec sheets before using for real orders.
+const MATERIALS = {
+  "3m": {
+    label: "3M",
+    grades: [
+      { value: "engineer-grade", label: "Engineer Grade (Series 3430)" },
+      { value: "hip", label: "High Intensity Prismatic (Series 3930)" },
+      { value: "dg3", label: "Diamond Grade DG3 (Series 4090)" },
+      { value: "dg-vip", label: "Diamond Grade VIP (Series 3990)" },
+    ],
+  },
+  "avery-dennison": {
+    label: "Avery Dennison",
+    grades: [
+      { value: "engineer-grade", label: "Engineer Grade (T-1500)" },
+      { value: "hip", label: "High Intensity (T-2500 / T-5500)" },
+      { value: "omnicube", label: "OmniCube Diamond Grade (T-11500)" },
+    ],
+  },
+  "orafol": {
+    label: "Orafol (ORALITE)",
+    grades: [
+      { value: "engineer-grade", label: "Engineer Grade (ORALITE 5500)" },
+      { value: "hip", label: "High Intensity Prismatic (ORALITE 5700)" },
+      { value: "elite", label: "Elite Prismatic Diamond Grade (ORALITE 5900)" },
+    ],
+  },
+  "custom": {
+    label: "Other / custom",
+    grades: [{ value: "custom", label: "See notes field" }],
+  },
+};
+
+const MAX_CUSTOM_LINES = 6;
+
+// Diamond geometry (viewBox is always square — both offered sizes, 36"x36"
+// and 48"x48", are square, so the preview's proportions never change). The
+// canvas is wider than the diamond itself so there's margin outside the
+// shape for the sign-size dimension lines (below/right of the diamond).
+const VIEWBOX = [0, 0, 700, 700];
+const DIAMOND_PAD = 120;
+const CANVAS = VIEWBOX[2];
+const DIAMOND_VERTICES = [
+  [350, DIAMOND_PAD], // top
+  [CANVAS - DIAMOND_PAD, 350], // right
+  [350, CANVAS - DIAMOND_PAD], // bottom
+  [DIAMOND_PAD, 350], // left
+];
+const TEXT_BOX = { x: 190, y: 190, w: 320, h: 320 };
+const DIM_COLOR = "#6b7280";
+const DIM_FONT = "IBM Plex Mono, ui-monospace, Consolas, monospace";
+
+// ---------------------------------------------------------------------------
+
+const el = (id) => document.getElementById(id);
+
+const legendPresetEl = el("legendPreset");
+const customLegendWrap = el("customLegendWrap");
+const customLegendLinesEl = el("customLegendLines");
+const addLegendLineBtn = el("addLegendLineBtn");
+const bgColorEl = el("bgColor");
+const sizeEl = el("size");
+const materialMfrEl = el("materialMfr");
+const materialGradeEl = el("materialGrade");
+const customMaterialWrap = el("customMaterialWrap");
+const customMaterialEl = el("customMaterial");
+const velcroLinesEl = el("velcroLines");
+const pocketTypeRadios = document.getElementsByName("pocketType");
+const custNameEl = el("custName");
+const custEmailEl = el("custEmail");
+const notesEl = el("notes");
+const previewSvg = el("preview");
+const summaryEl = el("summary");
+
+// Dynamic state: one custom legend line per entry, and one velcro overlay
+// setting per *current* legend line (kept in sync with whichever legend
+// source — preset or custom — is active).
+let customLines = [""];
+let velcroOverlays = [{ enabled: false, w: "", h: "" }];
+
+function populateSelect(selectEl, items, { valueKey = "value", labelKey = "label" } = {}) {
+  selectEl.innerHTML = "";
+  items.forEach((item) => {
+    const opt = document.createElement("option");
+    opt.value = item[valueKey];
+    opt.textContent = item[labelKey];
+    selectEl.appendChild(opt);
+  });
+}
+
+function populateMaterialManufacturers() {
+  const items = Object.entries(MATERIALS).map(([value, def]) => ({ value, label: def.label }));
+  populateSelect(materialMfrEl, items);
+}
+
+function populateMaterialGrades() {
+  const mfr = MATERIALS[materialMfrEl.value];
+  populateSelect(materialGradeEl, mfr.grades);
+  customMaterialWrap.classList.toggle("hidden", materialMfrEl.value !== "custom");
+}
+
+function getSelectedPocketType() {
+  return Array.from(pocketTypeRadios).find((r) => r.checked).value;
+}
+
+function getMaterialLabel() {
+  const mfr = MATERIALS[materialMfrEl.value];
+  const grade = mfr.grades.find((g) => g.value === materialGradeEl.value);
+  if (materialMfrEl.value === "custom") {
+    const note = customMaterialEl.value.trim();
+    return `Custom${note ? " — " + note : ""}`;
+  }
+  return `${mfr.label} — ${grade ? grade.label : ""}`;
+}
+
+function escapeXml(str) {
+  return str.replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" }[c]));
+}
+function escapeAttr(str) {
+  return str.replace(/"/g, "&quot;");
+}
+
+// ---------------------------------------------------------------------------
+// Legend lines: either the single preset string, or the editable custom
+// line list. Index-aligned with velcroOverlays.
+// ---------------------------------------------------------------------------
+
+function isCustomLegend() {
+  return legendPresetEl.value === "custom";
+}
+
+function getCurrentLines() {
+  if (isCustomLegend()) return customLines.slice();
+  const preset = findPreset(legendPresetEl.value);
+  return preset ? preset.lines.slice() : [""];
+}
+
+function syncVelcroOverlays() {
+  const n = getCurrentLines().length;
+  while (velcroOverlays.length < n) velcroOverlays.push({ enabled: false, w: "", h: "" });
+  velcroOverlays.length = n;
+}
+
+function renderCustomLegendLines() {
+  customLegendLinesEl.innerHTML = customLines
+    .map(
+      (line, i) => `
+      <div class="line-row">
+        <input type="text" class="legend-line-input" data-index="${i}" value="${escapeAttr(line)}" placeholder="Line ${i + 1} text">
+        ${customLines.length > 1 ? `<button type="button" class="remove-line" data-index="${i}" title="Remove line">&times;</button>` : ""}
+      </div>`
+    )
+    .join("");
+  addLegendLineBtn.disabled = customLines.length >= MAX_CUSTOM_LINES;
+}
+
+function renderVelcroLines() {
+  const lines = getCurrentLines();
+  velcroLinesEl.innerHTML = lines
+    .map((text, i) => {
+      const ov = velcroOverlays[i] || { enabled: false, w: "", h: "" };
+      return `
+      <div class="velcro-line" data-index="${i}">
+        <div class="velcro-line-label">Line ${i + 1}: "${escapeXml(text.trim() || "(empty)")}"</div>
+        <div class="velcro-toggle">
+          <label><input type="radio" name="velcroEnabled-${i}" value="no" ${!ov.enabled ? "checked" : ""}> No overlay</label>
+          <label><input type="radio" name="velcroEnabled-${i}" value="yes" ${ov.enabled ? "checked" : ""}> Overlay (velcro both sides)</label>
+        </div>
+        <div class="overlay-dims ${ov.enabled ? "" : "hidden"}">
+          <div class="dim-field">
+            <label>Overlay width (in)</label>
+            <input type="number" min="0.5" step="0.5" class="overlay-w" data-index="${i}" value="${escapeAttr(ov.w)}" placeholder="auto">
+          </div>
+          <div class="dim-field">
+            <label>Overlay height (in)</label>
+            <input type="number" min="0.5" step="0.5" class="overlay-h" data-index="${i}" value="${escapeAttr(ov.h)}" placeholder="auto">
+          </div>
+        </div>
+      </div>`;
+    })
+    .join("");
+}
+
+function updateVelcroLineLabels() {
+  const lines = getCurrentLines();
+  lines.forEach((text, i) => {
+    const label = velcroLinesEl.querySelector(`.velcro-line[data-index="${i}"] .velcro-line-label`);
+    if (label) label.textContent = `Line ${i + 1}: "${text.trim() || "(empty)"}"`;
+  });
+}
+
+function rebuildLegendAndVelcroUI() {
+  customLegendWrap.classList.toggle("hidden", !isCustomLegend());
+  if (isCustomLegend()) renderCustomLegendLines();
+  syncVelcroOverlays();
+  renderVelcroLines();
+}
+
+// ---------------------------------------------------------------------------
+// SVG preview
+// ---------------------------------------------------------------------------
+
+function getSignWidthInches() {
+  const [w] = sizeEl.value.split("x").map(Number);
+  return w || 36;
+}
+
+function getPxPerInch() {
+  return (CANVAS - 2 * DIAMOND_PAD) / getSignWidthInches();
+}
+
+// ---------------------------------------------------------------------------
+// CAD-style dimension annotations (extension lines + arrowed dimension line
+// + numeric label), used for sign size, lettering, and velcro overlay call-outs.
+// ---------------------------------------------------------------------------
+
+function formatInches(value) {
+  const rounded = Math.round(value * 10) / 10;
+  return `${rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1)}"`;
+}
+
+function dimArrow(x, y, dirX, dirY) {
+  const len = 9;
+  const wing = 3.5;
+  const nx = -dirY;
+  const ny = dirX;
+  const tip = [x, y];
+  const p1 = [x - dirX * len + nx * wing, y - dirY * len + ny * wing];
+  const p2 = [x - dirX * len - nx * wing, y - dirY * len - ny * wing];
+  return `<polygon points="${tip.join(",")} ${p1.join(",")} ${p2.join(",")}" fill="${DIM_COLOR}"/>`;
+}
+
+function dimExtLine(fromX, fromY, toX, toY) {
+  return `<line x1="${fromX}" y1="${fromY}" x2="${toX}" y2="${toY}" stroke="${DIM_COLOR}" stroke-width="1"/>`;
+}
+
+// Horizontal dimension line at height `y`, spanning featureX1..featureX2, with
+// extension lines dropped from each feature point (gapped a few px off the
+// feature, per CAD convention) down/up to the dimension line.
+function dimLineH(featureX1, featureY1, featureX2, featureY2, y, label) {
+  const gap = 4;
+  const dir1 = y > featureY1 ? 1 : -1;
+  const dir2 = y > featureY2 ? 1 : -1;
+  return [
+    dimExtLine(featureX1, featureY1 + gap * dir1, featureX1, y),
+    dimExtLine(featureX2, featureY2 + gap * dir2, featureX2, y),
+    `<line x1="${featureX1}" y1="${y}" x2="${featureX2}" y2="${y}" stroke="${DIM_COLOR}" stroke-width="1"/>`,
+    dimArrow(featureX1, y, -1, 0),
+    dimArrow(featureX2, y, 1, 0),
+    `<text x="${(featureX1 + featureX2) / 2}" y="${y - 8}" text-anchor="middle" font-family="${DIM_FONT}" font-size="15" fill="${DIM_COLOR}">${label}</text>`,
+  ].join("");
+}
+
+// Vertical dimension line at horizontal position `x`, spanning featureY1..featureY2.
+function dimLineV(featureX1, featureY1, featureX2, featureY2, x, label, labelSide = 1) {
+  const gap = 4;
+  const dir1 = x > featureX1 ? 1 : -1;
+  const dir2 = x > featureX2 ? 1 : -1;
+  return [
+    dimExtLine(featureX1 + gap * dir1, featureY1, x, featureY1),
+    dimExtLine(featureX2 + gap * dir2, featureY2, x, featureY2),
+    `<line x1="${x}" y1="${featureY1}" x2="${x}" y2="${featureY2}" stroke="${DIM_COLOR}" stroke-width="1"/>`,
+    dimArrow(x, featureY1, 0, -1),
+    dimArrow(x, featureY2, 0, 1),
+    `<text x="${x + 10 * labelSide}" y="${(featureY1 + featureY2) / 2}" text-anchor="${labelSide > 0 ? "start" : "end"}" dominant-baseline="central" font-family="${DIM_FONT}" font-size="15" fill="${DIM_COLOR}">${label}</text>`,
+  ].join("");
+}
+
+function computeLinesLayout(displayLines, box) {
+  const texts = displayLines.length ? displayLines.map((l) => l.text) : ["CUSTOM LEGEND"];
+  const maxLen = Math.max(...texts.map((t) => t.length), 1);
+
+  let fontSize = maxLen > 14 ? 32 : maxLen > 8 ? 42 : 52;
+  const maxByHeight = Math.floor(box.h / texts.length / 1.15);
+  fontSize = Math.min(fontSize, Math.max(16, maxByHeight));
+  const maxByWidth = box.w / (maxLen * 0.58);
+  fontSize = Math.max(14, Math.min(fontSize, maxByWidth));
+
+  const lineHeight = fontSize * 1.15;
+  const startY = box.y + box.h / 2 - ((texts.length - 1) * lineHeight) / 2;
+  const cx = box.x + box.w / 2;
+
+  return {
+    fontSize,
+    cx,
+    lines: texts.map((text, i) => ({
+      text,
+      y: startY + i * lineHeight,
+      overlayIndex: displayLines.length ? displayLines[i].i : null,
+    })),
+  };
+}
+
+function buildLegendSvg(layout, color) {
+  // dominant-baseline="central" makes `y` the visual vertical center of each
+  // line (not the text baseline) — without it, the whole block renders
+  // visibly low, since a baseline sits near the bottom of the glyphs.
+  const tspans = layout.lines
+    .map((line) => `<tspan x="${layout.cx}" y="${line.y}" dominant-baseline="central">${escapeXml(line.text)}</tspan>`)
+    .join("");
+  return `<text text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="${layout.fontSize}" fill="${color}">${tspans}</text>`;
+}
+
+function buildVelcroSvg(layout) {
+  const pxPerInch = getPxPerInch();
+  const stripW = 14;
+  const pieces = [];
+
+  layout.lines.forEach((line) => {
+    if (line.overlayIndex === null) return;
+    const ov = velcroOverlays[line.overlayIndex];
+    if (!ov || !ov.enabled) return;
+
+    const widthIn = parseFloat(ov.w);
+    const heightIn = parseFloat(ov.h);
+    const halfGap = widthIn > 0 ? (widthIn / 2) * pxPerInch : line.text.length * layout.fontSize * 0.29 + 20;
+    const stripH = heightIn > 0 ? heightIn * pxPerInch : layout.fontSize * 1.4;
+    const effectiveWidthIn = widthIn > 0 ? widthIn : (halfGap * 2) / pxPerInch;
+    const effectiveHeightIn = heightIn > 0 ? heightIn : stripH / pxPerInch;
+
+    const y = line.y - stripH / 2;
+    const leftX = layout.cx - halfGap - stripW;
+    const rightX = layout.cx + halfGap;
+    [leftX, rightX].forEach((x) => {
+      pieces.push(
+        `<g><rect x="${x}" y="${y}" width="${stripW}" height="${stripH}" fill="#eaeaea" stroke="#888" stroke-width="1.5"/>` +
+          `<path d="M ${x} ${y} L ${x + stripW} ${y + stripH} M ${x} ${y + stripH} L ${x + stripW} ${y}" stroke="#999" stroke-width="1"/></g>`
+      );
+    });
+
+    // Width dimension spans outer edge to outer edge of the strip pair,
+    // sitting just above them; height dimension runs beside the right strip.
+    pieces.push(dimLineH(leftX, y, rightX + stripW, y, y - 16, formatInches(effectiveWidthIn)));
+    pieces.push(dimLineV(rightX + stripW, y, rightX + stripW, y + stripH, rightX + stripW + 22, formatInches(effectiveHeightIn)));
+  });
+
+  return pieces.join("");
+}
+
+// Overall sign width/height — always equal (the diamond is square), shown
+// below and to the right of the shape using the exact selected nominal size.
+function buildSignDimensionsSvg() {
+  const [top, right, bottom, left] = DIAMOND_VERTICES;
+  const label = formatInches(getSignWidthInches());
+  const widthDim = dimLineH(left[0], left[1], right[0], right[1], CANVAS - 40, label);
+  const heightDim = dimLineV(top[0], top[1], bottom[0], bottom[1], CANVAS - 40, label, 1);
+  return widthDim + heightDim;
+}
+
+// Bounding box of the rendered legend text (widest line x total block
+// height), shown just above and to the left of the lettering itself.
+function buildLetteringDimensionsSvg(layout) {
+  if (!layout.lines.length) return "";
+  const pxPerInch = getPxPerInch();
+  const widestPx = Math.max(...layout.lines.map((l) => l.text.length * layout.fontSize * 0.58), 1);
+  const halfGlyph = layout.fontSize * 0.35;
+  const top = layout.lines[0].y - halfGlyph;
+  const bottom = layout.lines[layout.lines.length - 1].y + halfGlyph;
+
+  const widthDim = dimLineH(
+    layout.cx - widestPx / 2,
+    top,
+    layout.cx + widestPx / 2,
+    top,
+    top - 18,
+    formatInches(widestPx / pxPerInch)
+  );
+  const heightDim = dimLineV(
+    layout.cx - widestPx / 2,
+    top,
+    layout.cx - widestPx / 2,
+    bottom,
+    layout.cx - widestPx / 2 - 18,
+    formatInches((bottom - top) / pxPerInch),
+    -1
+  );
+  return widthDim + heightDim;
+}
+
+function buildPocketSvg(type) {
+  const r = 24;
+  const fill = type === "plastic" ? "#555" : "none";
+  const dash = type === "sewn" ? `stroke-dasharray="5,4"` : "";
+  return DIAMOND_VERTICES.map(
+    ([x, y]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" fill-opacity="0.85" stroke="#333" stroke-width="2" ${dash}/>`
+  ).join("");
+}
+
+function getDisplayLines() {
+  return getCurrentLines()
+    .map((text, i) => ({ text: text.trim(), i }))
+    .filter((l) => l.text !== "");
+}
+
+function renderPreview() {
+  const bg = bgColorEl.value;
+  const fg = LEGEND_COLOR;
+  const pocketType = getSelectedPocketType();
+  const displayLines = getDisplayLines();
+  const layout = computeLinesLayout(displayLines, TEXT_BOX);
+
+  const [vx, vy, vw, vh] = VIEWBOX;
+  previewSvg.setAttribute("viewBox", `${vx} ${vy} ${vw} ${vh}`);
+
+  const diamondPoints = DIAMOND_VERTICES.map((p) => p.join(",")).join(" ");
+  const outlineMarkup = `<polygon points="${diamondPoints}" fill="${bg}" stroke="${fg}" stroke-width="6" />`;
+
+  const svgParts = [
+    `<rect x="0" y="0" width="${vw}" height="${vh}" fill="#f0f1f3" />`,
+    outlineMarkup,
+    buildPocketSvg(pocketType),
+    buildVelcroSvg(layout),
+    buildSignDimensionsSvg(),
+    buildLetteringDimensionsSvg(layout),
+    buildLegendSvg(layout, fg),
+  ];
+
+  previewSvg.innerHTML = svgParts.join("\n");
+}
+
+function renderSummary() {
+  const bgLabel = bgColorEl.options[bgColorEl.selectedIndex].textContent;
+  const sizeLabel = sizeEl.options[sizeEl.selectedIndex].textContent;
+  const materialLabel = getMaterialLabel();
+  const pocketType = getSelectedPocketType();
+  const lines = getCurrentLines();
+
+  const legendSource = isCustomLegend()
+    ? "Custom"
+    : `MUTCD ${legendPresetEl.value} (Figure 6H-1)`;
+  const legendBlock = lines.map((t, i) => `  ${i + 1}. ${t.trim() || "(empty)"}`).join("\n");
+
+  const velcroBlock = lines
+    .map((t, i) => {
+      const ov = velcroOverlays[i] || { enabled: false };
+      if (!ov.enabled) return `  Line ${i + 1}: none`;
+      const w = ov.w ? `${ov.w}in W` : "auto W";
+      const h = ov.h ? `${ov.h}in H` : "auto H";
+      return `  Line ${i + 1}: yes — ${w} x ${h}`;
+    })
+    .join("\n");
+
+  const summaryLines = [
+    `LEGEND SOURCE: ${legendSource}`,
+    `LEGEND (diamond, top to bottom):`,
+    legendBlock,
+    `SHAPE: Diamond`,
+    `BACKGROUND COLOR: ${bgLabel}`,
+    `LEGEND/BORDER COLOR: Black`,
+    `SIZE: ${sizeLabel}`,
+    `MATERIAL: ${materialLabel}`,
+    `VELCRO OVERLAYS:`,
+    velcroBlock,
+    `FRAME POCKETS: ${pocketType} — all four corners`,
+  ];
+
+  if (notesEl.value.trim()) {
+    summaryLines.push("", `NOTES: ${notesEl.value.trim()}`);
+  }
+
+  summaryEl.textContent = summaryLines.join("\n");
+}
+
+function renderAll() {
+  renderPreview();
+  renderSummary();
+}
+
+// ---------------------------------------------------------------------------
+// PNG export (canvas round-trip of the current SVG)
+// ---------------------------------------------------------------------------
+
+function svgToPngBlob(svgEl) {
+  return new Promise((resolve, reject) => {
+    const [, , vw, vh] = svgEl.getAttribute("viewBox").split(" ").map(Number);
+    const scale = 2;
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgEl);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = vw * scale;
+      canvas.height = vh * scale;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("PNG export failed"))), "image/png");
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+async function downloadPreviewPng() {
+  const blob = await svgToPngBlob(previewSvg);
+  const filename = `sign-preview-${Date.now()}.png`;
+
+  // When running as a published Claude Artifact, plain <a download> links
+  // are inert (the viewer sandbox blocks self-triggered downloads) — use
+  // the platform's downloads capability instead, if this view has it.
+  if (window.claude && typeof window.claude.use === "function") {
+    try {
+      const downloads = await window.claude.use("downloads");
+      if (downloads) {
+        await downloads.save({ filename, data: blob });
+        return;
+      }
+    } catch (err) {
+      // Viewer declined, rate-limited, or capability unavailable — fall
+      // through to the plain-browser method below.
+    }
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// ---------------------------------------------------------------------------
+// Submit -> mailto
+// ---------------------------------------------------------------------------
+
+function submitRequest() {
+  const firstLine = getCurrentLines()[0] || "Custom sign";
+  const subject = `Roll-Up Sign Quote Request — ${firstLine}`;
+  const bodyLines = [
+    summaryEl.textContent,
+    "",
+    `Submitted by: ${custNameEl.value.trim() || "(not provided)"}`,
+    `Reply-to email: ${custEmailEl.value.trim() || "(not provided)"}`,
+    "",
+    "NOTE: Please attach the downloaded preview PNG to this email before sending",
+    "(mailto links cannot attach files automatically). Use the \"Download",
+    "Preview (PNG)\" button, then drag the file into this email.",
+  ];
+  const body = bodyLines.join("\n");
+  const mailto = `mailto:${encodeURIComponent(RECIPIENT_EMAIL)}?subject=${encodeURIComponent(
+    subject
+  )}&body=${encodeURIComponent(body)}`;
+
+  downloadPreviewPng().finally(() => {
+    const a = document.createElement("a");
+    a.href = mailto;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Wiring
+// ---------------------------------------------------------------------------
+
+function resetForm() {
+  legendPresetEl.selectedIndex = 0;
+  customLines = [""];
+  velcroOverlays = [{ enabled: false, w: "", h: "" }];
+  bgColorEl.selectedIndex = 0;
+  sizeEl.value = "36x36";
+  materialMfrEl.selectedIndex = 0;
+  populateMaterialGrades();
+  customMaterialEl.value = "";
+  document.querySelectorAll('input[name="pocketType"]')[0].checked = true;
+  custNameEl.value = "";
+  custEmailEl.value = "";
+  notesEl.value = "";
+  rebuildLegendAndVelcroUI();
+  renderAll();
+}
+
+function init() {
+  populateSelect(legendPresetEl, LEGEND_PRESET_OPTIONS);
+  populateMaterialManufacturers();
+  populateMaterialGrades();
+  rebuildLegendAndVelcroUI();
+
+  legendPresetEl.addEventListener("change", () => {
+    if (isCustomLegend() && customLines.length === 0) customLines = [""];
+    rebuildLegendAndVelcroUI();
+    renderAll();
+  });
+
+  addLegendLineBtn.addEventListener("click", () => {
+    if (customLines.length >= MAX_CUSTOM_LINES) return;
+    customLines.push("");
+    renderCustomLegendLines();
+    syncVelcroOverlays();
+    renderVelcroLines();
+    renderAll();
+  });
+
+  customLegendLinesEl.addEventListener("input", (e) => {
+    if (!e.target.matches(".legend-line-input")) return;
+    const i = Number(e.target.dataset.index);
+    customLines[i] = e.target.value;
+    updateVelcroLineLabels();
+    renderAll();
+  });
+
+  customLegendLinesEl.addEventListener("click", (e) => {
+    if (!e.target.matches(".remove-line")) return;
+    const i = Number(e.target.dataset.index);
+    customLines.splice(i, 1);
+    velcroOverlays.splice(i, 1);
+    if (customLines.length === 0) customLines = [""];
+    renderCustomLegendLines();
+    syncVelcroOverlays();
+    renderVelcroLines();
+    renderAll();
+  });
+
+  velcroLinesEl.addEventListener("change", (e) => {
+    const match = e.target.name && e.target.name.match(/^velcroEnabled-(\d+)$/);
+    if (!match) return;
+    const i = Number(match[1]);
+    velcroOverlays[i].enabled = e.target.value === "yes";
+    renderVelcroLines();
+    renderAll();
+  });
+
+  velcroLinesEl.addEventListener("input", (e) => {
+    const i = Number(e.target.dataset.index);
+    if (e.target.matches(".overlay-w")) velcroOverlays[i].w = e.target.value;
+    else if (e.target.matches(".overlay-h")) velcroOverlays[i].h = e.target.value;
+    else return;
+    renderAll();
+  });
+
+  [bgColorEl, sizeEl, materialMfrEl, materialGradeEl, customMaterialEl, notesEl].forEach((elm) =>
+    elm.addEventListener("input", renderAll)
+  );
+
+  materialMfrEl.addEventListener("change", () => {
+    populateMaterialGrades();
+    renderAll();
+  });
+
+  document.querySelectorAll('input[name="pocketType"]').forEach((r) => r.addEventListener("change", renderAll));
+
+  el("resetBtn").addEventListener("click", resetForm);
+  el("downloadBtn").addEventListener("click", downloadPreviewPng);
+  el("submitBtn").addEventListener("click", submitRequest);
+
+  renderAll();
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
